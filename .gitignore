@@ -1,0 +1,61 @@
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.python-version
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Type checking and linting
+.mypy_cache/
+.ruff_cache/
+.pyright/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Local databases and generated data
+*.db
+*.sqlite3
+data/
+
+# Docker and local development
+docker-compose.override.yml
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Temporary files
+tmp/
+temp/
