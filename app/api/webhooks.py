@@ -2,9 +2,12 @@ import hashlib
 import hmac
 
 from fastapi import APIRouter, Header, HTTPException, Request
+from sqlalchemy import select
 
 from app.api.schemas import WorkflowRunPayload
 from app.core.config import get_settings
+from app.db.database import SessionLocal
+from app.db.models import WorkflowRunRecord
 
 router = APIRouter(prefix="/webhooks", tags=["Webhooks"])
 
@@ -74,6 +77,34 @@ async def github_webhook(
             "status": "ignored",
             "reason": "Workflow did not fail",
         }
+
+    with SessionLocal() as db:
+        existing = db.scalar(
+            select(WorkflowRunRecord).where(
+                WorkflowRunRecord.delivery_id == x_github_delivery
+            )
+        )
+
+        if existing:
+            return {
+                "status": "already_processed",
+                "delivery_id": x_github_delivery,
+                "workflow_id": existing.github_workflow_id,
+            }
+
+        record = WorkflowRunRecord(
+            github_workflow_id=workflow.id,
+            delivery_id=x_github_delivery,
+            repository=payload.repository.full_name,
+            workflow_name=workflow.name,
+            branch=workflow.head_branch,
+            commit_sha=workflow.head_sha,
+            conclusion=workflow.conclusion,
+            html_url=workflow.html_url,
+        )
+
+        db.add(record)
+        db.commit()
 
     return {
         "status": "accepted",
